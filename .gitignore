@@ -2,11 +2,11 @@
 .Rhistory
 .RData
 .Ruserdata
-
 .DS_Store
+connection.R
+
 .ipynb_checkpoints/
 cleaning.scripts/
 data/
 dev_reactable.R
 dev_plot.R
-connection.R

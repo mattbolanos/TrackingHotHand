@@ -13,7 +13,7 @@ library(shinythemes)
 # nbastatR connect thing
 Sys.setenv("VROOM_CONNECTION_SIZE" = 1350000)
 
-# Source DB connetion
+# # # Source DB connetion
 source("connection.R")
 # Source functions
 source("utilities.R")
@@ -24,11 +24,10 @@ source("modules/module_home.R")
 ## UI ## 
 fluidPage(
   theme = shinytheme(theme = "yeti"),
-  title = "NBA Hot Hand Analysis",
   # CSS Components to include
   tags$head(tags$link(rel="stylesheet", type="text/css", href="main.css")),
   navbarPage(
-    "NBA Hot Hand Analysis",
+    title = "NBA Hot Hand Analysis",
     position = "fixed-top",
     tabPanel(
       "Home",
