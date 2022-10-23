@@ -4,7 +4,6 @@
 .Ruserdata
 .DS_Store
 connection.R
-
 .ipynb_checkpoints/
 cleaning.scripts/
 data/
