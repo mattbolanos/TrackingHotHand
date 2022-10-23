@@ -8,4 +8,5 @@
 cleaning.scripts/
 data/
 dev_reactable.R
+dev_plot.R
 connection.R
