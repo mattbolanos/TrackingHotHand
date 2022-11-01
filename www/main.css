@@ -1,5 +1,6 @@
 @import url(https://fonts.googleapis.com/css?family=Karla);
 
+/* selectize dropdowns */
 .selectize-input, .selectize-dropdown {
   font-family: 'Karla', sans-serif;
   font-size: 16px;
@@ -11,3 +12,14 @@
   font-weight: bold;
 }
 
+/* reactables */
+.defender-table {
+  margin: 0 auto;
+  min-height: 590px;
+}
+
+.slider-label {
+  font-family: 'Georgia', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}

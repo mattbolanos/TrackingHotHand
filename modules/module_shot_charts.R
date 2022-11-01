@@ -9,7 +9,6 @@ shot_chart_ui <- function(id){
       title = "",
       br(),
       br(),
-      br(),
       strong(
         "2015-2021 Shot Charts by Streak",style = "font-size:30px;font-family:Georgia; color:black"
       ),
@@ -32,7 +31,7 @@ shot_chart_ui <- function(id){
         column(2, offset = 0, selectizeInput(NS(id, "year_choice"), choices = NULL, label = "Season(s)")),
         column(2, offset = 0, selectizeInput(NS(id, "streak_choice"), choices = NULL, label = "Streak")),
         column(3, offset = 0, selectizeInput(NS(id, "scope_choice"), choices = NULL, label = "Scope")),
-        column(2, offset = 0, uiOutput(NS(id, "update_choice"), choices = NULL, label = "Update"))
+        column(2, offset = 0, uiOutput(NS(id, "update_choice"), label = "Update"))
       ),
       # Shot chart plot
       fluidRow(
@@ -53,9 +52,9 @@ shot_chart_ui <- function(id){
   
 }
 
-# ------------------------- #
-# --- shot chart Server --- #
-# ------------------------- #
+# -------------- #
+# --- server --- #
+# -------------- #
 
 shot_chart_server <- function(id){
   
@@ -111,8 +110,7 @@ shot_chart_server <- function(id){
       options = list(onDelete = I('function(value) {return false;}'))
     )
     
-    # 
-    # # Update btn
+    # Update btn
     output$update_choice <- renderUI({
       
       actionButton(
@@ -125,7 +123,7 @@ shot_chart_server <- function(id){
     
     output$streak_table <- renderReactable({
       
-      # Load intital table
+      # Load initial table
       shot_sum_table(
         league_averages %>% 
           filter(
@@ -152,7 +150,7 @@ shot_chart_server <- function(id){
     }, deleteFile = T)
     
     
-    observeEvent(input$updatebtn,{
+    observeEvent(input$updatebtn, {
       
       # Set outputs to null after button push
       output$streak_plot <- renderImage({NULL}, deleteFile = T)
@@ -423,100 +421,3 @@ shot_chart_server <- function(id){
     })
   })
 }
-
-
-# 
-# 
-# 
-# output$table2 <- DT::renderDataTable({
-#   
-#   vals = reactiveValues(
-#     streak = ""
-#   )
-#   
-#   vals$streak <- as.vector(input$streak2)
-#   
-#   streaky_sel <- vals$streak
-#   
-#   tab_query <- paste0("SELECT shooter, streak_col, type_shot,zone_basic,name_zone,
-#      zone_range, distance_shot, is_shot_attempted, is_shot_made,
-#      closest_defender_distance_bin FROM full_hhand_shots_tracking WHERE streak_col = '", streaky_sel, "'")
-#   
-#   all_shots <- dbGetQuery(con, tab_query)
-#   
-#   total_shots <- dbGetQuery(con, "SELECT shooter, closest_defender_distance_bin,
-#                           is_shot_attempted FROM full_hhand_shots_tracking")
-#   
-#   total_fgas <- total_shots %>% 
-#     mutate(defender_distance= case_when(closest_defender_distance_bin == "Wide Open" ~ "Open",
-#                                         closest_defender_distance_bin == "Very Tight" ~ "Tight",
-#                                         TRUE ~ closest_defender_distance_bin)) %>% 
-#     group_by(shooter) %>% 
-#     summarise(total_fga = sum(is_shot_attempted),
-#               total_tight_attempts = sum(defender_distance =="Tight"),
-#               percent_fga_tight = total_tight_attempts/total_fga) 
-#   
-#   
-#   
-#   averages <- all_shots %>% 
-#     group_by(shooter,streak_col) %>% 
-#     summarise(fgm = sum(is_shot_made),
-#               fga = sum(is_shot_attempted),
-#               threes = sum(type_shot %like% "3PT"),
-#               base_streak_efg = (fgm+(.5*threes))/fga) %>% 
-#     select(shooter, base_streak_efg)
-#   
-#   final_data <- all_shots %>% 
-#     mutate(defender_distance= case_when(closest_defender_distance_bin == "Wide Open" ~ "Open",
-#                                         closest_defender_distance_bin == "Very Tight" ~ "Tight",
-#                                         TRUE ~ closest_defender_distance_bin)) %>% 
-#     group_by(shooter, streak_col, defender_distance) %>%
-#     
-#     summarise(fgm = sum(is_shot_made),
-#               fga = sum(is_shot_attempted),
-#               fg_percent = fgm/fga,
-#               threes = sum(type_shot %like% "3PT"),
-#               efg_percent = (fgm+(.5*threes))/fga) %>% 
-#     ungroup() %>% 
-#     select(shooter,streak_col, defender_distance, efg_percent,fga) %>%
-#     pivot_wider(names_from = c("defender_distance","streak_col"),
-#                 values_from = c("efg_percent", "fga"),values_fill = 0, names_sep = "_") %>%
-#     left_join(averages, by = c("shooter")) %>%
-#     clean_names() %>%
-#     left_join(total_fgas, by = c("shooter")) %>%
-#     mutate(streak_fga=Reduce("+",.[4:5]),
-#            coverage_diff = Reduce("-",.[3:2])
-#     ) %>%
-#     mutate_if(is.numeric, round,digits=4) %>% 
-#     select(1,7,10,9,6,2,3,11) %>% 
-#     arrange(desc(streak_fga))
-#   
-#   color_col <-final_data[6:6]
-#   
-#   (brks <- quantile(color_col, probs = seq(0, 1, .01), na.rm = TRUE)) 
-#   (max_val <-max(color_col,na.rm=TRUE))
-#   
-#   (clrs_rmp <- colorRamp(c("lightskyblue","red"))(c(0,brks/max_val)))
-#   
-#   (clrs_df <- clrs_rmp %>% 
-#       as_tibble(.name_repair ="minimal") %>% 
-#       setNames(nm=c("r","g","b")) %>% 
-#       mutate_all(~as.character(round(.,digits=0)))  %>% mutate(mycolor=paste0("rgb(",
-#                                                                               paste(r,g,b,sep = ","),
-#                                                                               ")")))
-#   (clrs <- pull(clrs_df,mycolor))
-#   
-#   
-#   
-#   DT::datatable(final_data,filter = "top",rownames = FALSE,options = list(pagelength = 15, scrollX=TRUE,
-#                                                                           columnDefs = list(list(className = 'dt-center', targets = 0:7))),
-#                 colnames= c("Player", "Total FGA", 'Total Streak FGA',
-#                             "%Total FGA Tight", "Streak eFG%", "Streak Open eFG%", 
-#                             "Streak Tight eFG%", "Coverage Diff")) %>%
-#     formatStyle(c(5,7), backgroundColor = styleInterval(brks, clrs))
-# }
-# )
-
-#   })
-# }
-

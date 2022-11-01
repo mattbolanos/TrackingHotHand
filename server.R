@@ -10,4 +10,7 @@ shinyServer(function(input, output, session) {
   # Shot chart server
   shot_chart_server("shot_chart")
   
+  # Closest def server
+  distance_server("distance")
+  
 })

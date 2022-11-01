@@ -15,6 +15,7 @@ library(extrafont)
 library(prismatic)
 library(grid)
 library(ggtext)
+library(htmltools)
 
 # Set margin def
 margin <- ggplot2::margin
@@ -38,413 +39,8 @@ circle_points <- function(center = c(0, 0), radius = 1, npoints = 360) {
                     y = center[2] + radius * sin(angles)))
 }
 
-# Plot shot chart
-plot_shot_chart <- function(hex_df, type = "League Avg", streak_sel, year_sel, player_sel){
-  
-  headshot_url <- players %>%
-    filter(
-      namePlayer == player_sel
-    ) %>%
-    pull(urlPlayerHeadshot)
-  
-  # Download headshot
-  t <- tempfile()
-  download.file(headshot_url, t, mode = "wb")
-  pic <- readPNG(t)
-  
-  if (type == "League Avg"){
-    
-    legend_title <- paste0("FG% vs. League Average After ", streak_sel)
-    
-  }else{
-    
-    # Get first name
-    first_name <- paste0(word(player_sel, 1))
-    
-    first_name_ins <- paste0(
-      first_name,
-      ifelse(substr(first_name, nchar(first_name), nchar(first_name)) == "s", "'", "'s")
-    )
-    
-    legend_title <- paste("FG% vs.", first_name_ins, "Base Zone Average")
-    
-  }
-  # Set court theme
-  court_theme <- light_court_theme$light
-
-  
-  p <- ggplot() +
-    geom_polygon(
-      data = hex_df,
-      aes(
-        x = adj_x,
-        y = adj_y,
-        group = hexbin_id, 
-        fill = bounded_fg_diff, 
-        color = after_scale(clr_darken(fill, .25))
-      ),
-      size = .5
-    ) + 
-    scale_x_continuous(
-      limits = c(-27.5, 27.5)
-    ) + 
-    scale_y_continuous(
-      limits = c(0, 62)
-    ) +
-    scale_linetype_identity() +
-    scale_fill_distiller(
-      direction = -1, 
-      palette = "RdBu", 
-      limits = c(-.15, .15), 
-      breaks = seq(-.15, .15, .03),
-      labels = c("-15%", "-12%", "-9%", "-6%", "-3%", "0%", "+3%", "+6%", "+9%", "+12%", "+15%"),
-      legend_title
-    ) +
-    guides(
-      fill = guide_legend(
-        label.position = 'bottom', 
-        title.position = 'top', 
-        default.unit="inch", 
-        title.hjust = .5,
-        title.vjust = 0,
-        label.vjust = 3,
-        nrow = 1
-      )
-    )+
-    labs(
-      title = paste0(player_sel, " After ", streak_sel),
-      subtitle = paste0(year_sel, " Regular Season"),
-      caption = ("Chart: @mattabolanos | Data: NBA Stats API")
-    )+
-    geom_path(
-      data = court_points,
-      aes(x = x, y = y, group = desc, linetype = dash),
-      color = court_theme$lines
-    ) +
-    coord_fixed(
-      ylim = c(0, 48), xlim = c(-25, 25), clip = "off"
-    ) +
-    theme(
-      plot.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
-      panel.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
-      panel.grid = element_blank(),
-      legend.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
-      legend.key.width = unit(.08, "npc"),
-      legend.key.height = unit(.03, "npc"),
-      line = element_blank(),
-      axis.title.x = element_blank(),
-      axis.title.y = element_blank(),
-      axis.text.x = element_blank(),
-      axis.text.y = element_blank(),
-      text=element_text(size=11,  family= "Georgia", color = court_theme$text),
-      legend.spacing.x = unit(0, "npc"), 
-      legend.title=element_text(size=13, face = "bold.italic"),
-      legend.text = element_text(size = 10.5, face = "bold"), 
-      legend.margin= margin(t = -.065, unit = 'npc'),
-      plot.margin = margin(unit = "npc"),
-      legend.position = 'bottom',
-      # legend.box.margin = leg_box_mar, 
-      plot.title = element_text(hjust = 0.5, size = 16, face = "bold", vjust = -2),
-      plot.subtitle = element_text(hjust = 0.5, size = 14, vjust = -2.5, face = "italic", margin = margin(b = -.25, unit = "npc")), 
-      plot.caption = element_text(hjust = 0.5, size = 10, vjust = 2.5)
-    )
-  
-  # Add headshot
-  fin <- ggdraw(p)+
-    theme(
-      plot.background = element_rect(fill="#FFFCF7", color = NA),
-      panel.border = element_rect(colour = "#232323", fill=NA, size = 1 )
-
-    ) +
-    annotation_custom(
-      rasterGrob(pic, width = unit(.13,'npc'), x = .067, y = .949, default.units = "npc")
-    )
-  
-  ggsave("shot_chart.png", fin, h = 7.75, w = 8)
-
-}
-
-# Plot empty data
-plot_empty <- function(streak_sel, year_sel, player_sel){
-  
-  headshot_url <- players %>%
-    filter(
-      namePlayer == player_sel
-    ) %>%
-    pull(urlPlayerHeadshot)
-  
-  # Download headshot
-  t <- tempfile()
-  download.file(headshot_url, t, mode = "wb")
-  pic <- readPNG(t)
-  
-  # Set court theme
-  court_theme <- light_court_theme$light
-  
-  # Empty plot
-  p <- ggplot() +
-    scale_x_continuous(
-      limits = c(-27.5, 27.5)
-    ) + 
-    scale_y_continuous(
-      limits = c(0, 62)
-    ) +
-    scale_linetype_identity() +
-    guides(
-      fill = guide_legend(
-        label.position = 'bottom', 
-        title.position = 'top', 
-        default.unit="inch", 
-        title.hjust = .5,
-        title.vjust = 0,
-        label.vjust = 3,
-        nrow = 1
-      )
-    ) +
-    labs(
-      title = paste0(player_sel, " After ", streak_sel),
-      subtitle = paste0(year_sel, " Regular Season")
-    ) +
-    geom_path(
-      data = court_points,
-      aes(x = x, y = y, group = desc, linetype = dash),
-      color = court_theme$lines
-    ) +
-    coord_fixed(
-      ylim = c(0, 48), xlim = c(-25, 25)
-    ) +
-    geom_text(
-      aes(x = 0, y = 38, label = "No Shots Found - Try a Different Filter!"),
-      size = 6.5
-    ) +
-    theme(
-      plot.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
-      panel.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
-      panel.grid = element_blank(),
-      legend.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
-      legend.key.width = unit(.05, "npc"),
-      legend.key.height = unit(.03, "npc"),
-      line = element_blank(),
-      axis.title.x = element_blank(),
-      axis.title.y = element_blank(),
-      axis.text.x = element_blank(),
-      axis.text.y = element_blank(),
-      text=element_text(size=11,  family= "Georgia", color = court_theme$text),
-      legend.spacing.x = unit(0, "npc"), 
-      legend.title=element_text(size=13, face = "bold.italic"),
-      legend.text = element_text(size = 9), 
-      legend.margin= margin(t = -.065, unit = 'npc'),
-      plot.margin = margin(unit = "npc"),
-      legend.position = 'bottom',
-      # legend.box.margin = leg_box_mar, 
-      plot.title = element_text(hjust = 0.5, size = 16, face = "bold", vjust = -2),
-      plot.subtitle = element_text(hjust = 0.5, size = 14, vjust = -2.5, face = "italic", margin = margin(b = -.25, unit = "npc")), 
-      plot.caption = element_text(hjust = 0.5, size = 8.5, vjust = 2.5)
-    )
-  
-  # Add headshot
-  fin <- ggdraw(p)+
-    theme(
-      plot.background = element_rect(fill="#FFFCF7", color = NA),
-      panel.border = element_rect(colour = "#232323", fill=NA, size = 1 )
-      
-    ) +
-    annotation_custom(
-      rasterGrob(pic, width = unit(.13,'npc'), x = .067, y = .949, default.units = "npc")
-    )
-  
-  ggsave("shot_chart.png", fin, h = 7.75, w = 8)
-  
-}
-
-# Summary GT table
-shot_sum_table <- function(base_pct_df, streak_pct_df, type = "Compared to League Average"){
-  
-  # Construct summary df
-  zone_sum <- streak_pct_df %>%
-    # Only take zones present in both
-    inner_join(
-      base_pct_df,
-      by = c("zone_range", "name_zone")
-    ) %>% 
-    mutate(
-      fg_diff = streak_pct - base_pct,
-      across(
-        .cols = c(
-          streak_pct, streak_pps, fg_diff
-        ),
-        ~ round(.x, 2)
-      ),
-      name_zone = gsub("Side", "", name_zone)
-    ) %>%
-    # Don't need back court shots
-    filter(
-      name_zone != "Back Court"
-    ) %>% 
-    replace(
-      is.na(.), 0
-    ) %>% 
-    mutate(
-      # Calculate color references
-      max_att = max(streak_fga, na.rm = TRUE),
-      max_pps = ifelse(max(streak_pps, na.rm = TRUE) > 1.7, max(streak_pps, na.rm = TRUE), 1.7),
-      max_fgp = ifelse(max(streak_pct, na.rm = TRUE) > .7, max(streak_pct, na.rm = TRUE), .7),
-      col_streak_pct = get_color(streak_pct / max_fgp),
-      col_streak_pps = get_color(streak_pps / max_pps),
-      col_streak_fga = get_color(streak_fga / max_att),
-      icon_fg_diff = ifelse(
-        fg_diff < 0,
-        "https://images.emojiterra.com/google/android-10/512px/1f9ca.png",
-        "https://images.emojiterra.com/google/android-11/512px/1f525.png"
-      ),
-      # Adjust zone_range for sorting
-      zone_range = case_when(
-        zone_range == "Less Than 8 ft." ~ 7,
-        zone_range == "24+ ft." ~ 24,
-        TRUE ~ as.numeric(str_split(zone_range, pattern = "-", simplify = T, n = 2)[,1])
-      )
-    ) %>%
-    select(
-      zone_range, name_zone, streak_pct, streak_pps, streak_fga, fg_diff, starts_with("col_"), icon_fg_diff
-    ) %>% 
-    suppressWarnings() %>% 
-    arrange(
-      desc(streak_fga)
-    )
-  
-  # Set last column title
-  if (type == "Compared to League Average"){
-    
-    col_title <- "&Delta; Lg Avg Zone FG%"
-    
-  }else{
-    
-    col_title <- "&Delta; Player Zone FG%"
-    
-  }
-  
-  # Create reactable
-  zone_sum %>% 
-    reactable(
-      compact = TRUE,
-      language = reactableLang(
-        noData = "No Shots Found"
-      ),
-      defaultPageSize = 15,
-      columnGroups = list(
-        colGroup(name = "Shot Zone", columns = c("zone_range", "name_zone")),
-        colGroup(name = "Zone Stats", columns = c("streak_pct", "streak_pps", "fg_diff", "streak_fga"))
-      ),
-      theme = reactableTheme(
-        headerStyle = list(
-          "&:hover[aria-sort]" = list(background = "hsl(0, 0%, 96%)"),
-          "&[aria-sort='ascending'], &[aria-sort='descending']" = list(background = "hsl(0, 0%, 96%)"),
-          borderColor = "#555"
-        )
-      ),
-      striped = FALSE,
-      borderless = TRUE,
-      showSortIcon = TRUE,
-      searchable = FALSE,
-      defaultColDef = colDef(
-        style = cell_style(font_weight = 500)
-      ),
-      style = list(fontFamily = "Karla"),
-      columns = list(
-        zone_range = colDef(
-          name = "Distance",
-          maxWidth = 90,
-          align = "center",
-          cell = function(x){
-            
-            if (x == 7){
-              
-              val <- "< 8 ft."
-              
-            }
-            
-            if (x %in% c(8, 16)){
-              
-              val <- paste0(x, "-", x + 8, " ft.")
-              
-            }
-            
-            if (x == 24){
-              
-              val <- "24+ ft."
-              
-            }
-            
-            val
-            
-          },
-          style = cell_style(font_weight = "bold")
-        ),
-        name_zone = colDef(
-          name = "Area",
-          maxWidth = 100,
-          align = "center",
-          style = cell_style(font_weight = "bold")
-        ),
-        streak_pct = colDef(
-          name = "Streak FG%",
-          maxWidth = 105,
-          align = "center",
-          format = colFormat(percent = TRUE),
-          style = color_scales(
-            zone_sum,
-            color_ref = "col_streak_pct"
-          )
-        ),
-        streak_pps = colDef(
-          name = "Streak PPS",
-          maxWidth = 105,
-          align = "center",
-          format = colFormat(digits = 1),
-          style = color_scales(
-            zone_sum,
-            color_ref = "col_streak_pps"
-          )
-        ),
-        streak_fga = colDef(
-          name = "Streak FGA",
-          maxWidth = 105,
-          align = "center",
-          style = color_scales(
-            zone_sum,
-            color_ref = "col_streak_fga"
-          )
-        ),
-        fg_diff = colDef(
-          name = col_title,
-          width = 160,
-          html = T,
-          align = 'center',
-          cell = data_bars(
-            ., 
-            fill_color = c("lightblue", "orange"),
-            number_fmt = scales::percent,
-            bold_text = TRUE,
-            img_ref = "icon_fg_diff",
-            border_width = "thick",
-            min_value = -1,
-            max_value = 1,
-            bar_height = 20,
-            text_size = 13
-          ),
-          style = list(borderLeft = "1px dashed rgba(0, 0, 0, 0.3)")
-        ),
-        # Don't need to show colors and icon references
-        col_streak_pct = colDef(show = FALSE),
-        col_streak_pps = colDef(show = FALSE),
-        col_streak_fga = colDef(show = FALSE),
-        icon_fg_diff = colDef(show = FALSE)
-      )
-    )
-}
-
 # Calculate hex bins for shot chart
-get_hexbin_data <- function(type = "League Avg", player_shots, comparison_shots){
+get_hexbin_data <- function(type = "League Avg", player_shots, comparison_shots) {
   
   # If comparing to league average
   if (type == "League Avg"){
@@ -716,6 +312,806 @@ get_hexbin_data <- function(type = "League Avg", player_shots, comparison_shots)
   
 }
 
+# Plot shot chart
+plot_shot_chart <- function(hex_df, type = "League Avg", streak_sel, year_sel, player_sel) {
+  
+  headshot_url <- players %>%
+    filter(
+      namePlayer == player_sel
+    ) %>%
+    pull(urlPlayerHeadshot)
+  
+  # Download headshot
+  t <- tempfile()
+  download.file(headshot_url, t, mode = "wb")
+  pic <- readPNG(t)
+  
+  if (type == "League Avg"){
+    
+    legend_title <- paste0("FG% vs. League Average After ", streak_sel)
+    
+  }else{
+    
+    # Get first name
+    first_name <- paste0(word(player_sel, 1))
+    
+    first_name_ins <- paste0(
+      first_name,
+      ifelse(substr(first_name, nchar(first_name), nchar(first_name)) == "s", "'", "'s")
+    )
+    
+    legend_title <- paste("FG% vs.", first_name_ins, "Base Zone Average")
+    
+  }
+  # Set court theme
+  court_theme <- light_court_theme$light
+  
+  
+  p <- ggplot() +
+    geom_polygon(
+      data = hex_df,
+      aes(
+        x = adj_x,
+        y = adj_y,
+        group = hexbin_id, 
+        fill = bounded_fg_diff, 
+        color = after_scale(clr_darken(fill, .25))
+      ),
+      size = .5
+    ) + 
+    scale_x_continuous(
+      limits = c(-27.5, 27.5)
+    ) + 
+    scale_y_continuous(
+      limits = c(0, 62)
+    ) +
+    scale_linetype_identity() +
+    scale_fill_distiller(
+      direction = -1, 
+      palette = "RdBu", 
+      limits = c(-.15, .15), 
+      breaks = seq(-.15, .15, .03),
+      labels = c("-15%", "-12%", "-9%", "-6%", "-3%", "0%", "+3%", "+6%", "+9%", "+12%", "+15%"),
+      legend_title
+    ) +
+    guides(
+      fill = guide_legend(
+        label.position = 'bottom', 
+        title.position = 'top', 
+        default.unit="inch", 
+        title.hjust = .5,
+        title.vjust = 0,
+        label.vjust = 3,
+        nrow = 1
+      )
+    )+
+    labs(
+      title = paste0(player_sel, " After ", streak_sel),
+      subtitle = paste0(year_sel, " Regular Season"),
+      caption = ("Chart: @mattabolanos | Data: NBA Stats API")
+    )+
+    geom_path(
+      data = court_points,
+      aes(x = x, y = y, group = desc, linetype = dash),
+      color = court_theme$lines
+    ) +
+    coord_fixed(
+      ylim = c(0, 48), xlim = c(-25, 25), clip = "off"
+    ) +
+    theme(
+      plot.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
+      panel.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
+      panel.grid = element_blank(),
+      legend.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
+      legend.key.width = unit(.08, "npc"),
+      legend.key.height = unit(.03, "npc"),
+      line = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      text=element_text(size=11,  family= "Georgia", color = court_theme$text),
+      legend.spacing.x = unit(0, "npc"), 
+      legend.title=element_text(size=13, face = "bold.italic"),
+      legend.text = element_text(size = 10.5, face = "bold"), 
+      legend.margin= margin(t = -.065, unit = 'npc'),
+      plot.margin = margin(unit = "npc"),
+      legend.position = 'bottom',
+      # legend.box.margin = leg_box_mar, 
+      plot.title = element_text(hjust = 0.5, size = 16, face = "bold", vjust = -2),
+      plot.subtitle = element_text(hjust = 0.5, size = 14, vjust = -2.5, face = "italic", margin = margin(b = -.25, unit = "npc")), 
+      plot.caption = element_text(hjust = 0.5, size = 10, vjust = 2.5)
+    )
+  
+  # Add headshot
+  fin <- ggdraw(p)+
+    theme(
+      plot.background = element_rect(fill="#FFFCF7", color = NA),
+      panel.border = element_rect(colour = "#232323", fill=NA, size = 1 )
+      
+    ) +
+    annotation_custom(
+      rasterGrob(pic, width = unit(.13,'npc'), x = .067, y = .949, default.units = "npc")
+    )
+  
+  ggsave("shot_chart.png", fin, h = 7.75, w = 8)
+  
+}
+
+# Plot empty data
+plot_empty <- function(streak_sel, year_sel, player_sel)  {
+  
+  headshot_url <- players %>%
+    filter(
+      namePlayer == player_sel
+    ) %>%
+    pull(urlPlayerHeadshot)
+  
+  # Download headshot
+  t <- tempfile()
+  download.file(headshot_url, t, mode = "wb")
+  pic <- readPNG(t)
+  
+  # Set court theme
+  court_theme <- light_court_theme$light
+  
+  # Empty plot
+  p <- ggplot() +
+    scale_x_continuous(
+      limits = c(-27.5, 27.5)
+    ) + 
+    scale_y_continuous(
+      limits = c(0, 62)
+    ) +
+    scale_linetype_identity() +
+    guides(
+      fill = guide_legend(
+        label.position = 'bottom', 
+        title.position = 'top', 
+        default.unit="inch", 
+        title.hjust = .5,
+        title.vjust = 0,
+        label.vjust = 3,
+        nrow = 1
+      )
+    ) +
+    labs(
+      title = paste0(player_sel, " After ", streak_sel),
+      subtitle = paste0(year_sel, " Regular Season")
+    ) +
+    geom_path(
+      data = court_points,
+      aes(x = x, y = y, group = desc, linetype = dash),
+      color = court_theme$lines
+    ) +
+    coord_fixed(
+      ylim = c(0, 48), xlim = c(-25, 25)
+    ) +
+    geom_text(
+      aes(x = 0, y = 38, label = "No Shots Found - Try a Different Filter!"),
+      size = 6.5
+    ) +
+    theme(
+      plot.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
+      panel.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
+      panel.grid = element_blank(),
+      legend.background = element_rect(fill = '#FFFCF7', color = '#FFFCF7'),
+      legend.key.width = unit(.05, "npc"),
+      legend.key.height = unit(.03, "npc"),
+      line = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      text=element_text(size=11,  family= "Georgia", color = court_theme$text),
+      legend.spacing.x = unit(0, "npc"), 
+      legend.title=element_text(size=13, face = "bold.italic"),
+      legend.text = element_text(size = 9), 
+      legend.margin= margin(t = -.065, unit = 'npc'),
+      plot.margin = margin(unit = "npc"),
+      legend.position = 'bottom',
+      # legend.box.margin = leg_box_mar, 
+      plot.title = element_text(hjust = 0.5, size = 16, face = "bold", vjust = -2),
+      plot.subtitle = element_text(hjust = 0.5, size = 14, vjust = -2.5, face = "italic", margin = margin(b = -.25, unit = "npc")), 
+      plot.caption = element_text(hjust = 0.5, size = 8.5, vjust = 2.5)
+    )
+  
+  # Add headshot
+  fin <- ggdraw(p)+
+    theme(
+      plot.background = element_rect(fill="#FFFCF7", color = NA),
+      panel.border = element_rect(colour = "#232323", fill=NA, size = 1 )
+      
+    ) +
+    annotation_custom(
+      rasterGrob(pic, width = unit(.13,'npc'), x = .067, y = .949, default.units = "npc")
+    )
+  
+  ggsave("shot_chart.png", fin, h = 7.75, w = 8)
+  
+}
+
+# Summary GT table
+shot_sum_table <- function(base_pct_df, streak_pct_df, type = "Compared to League Average"){
+  
+  # Construct summary df
+  zone_sum <- streak_pct_df %>%
+    # Only take zones present in both
+    inner_join(
+      base_pct_df,
+      by = c("zone_range", "name_zone")
+    ) %>% 
+    mutate(
+      fg_diff = streak_pct - base_pct,
+      across(
+        .cols = c(
+          streak_pct, streak_pps, fg_diff
+        ),
+        ~ round(.x, 2)
+      ),
+      name_zone = gsub("Side", "", name_zone)
+    ) %>%
+    # Don't need back court shots
+    filter(
+      name_zone != "Back Court"
+    ) %>% 
+    replace(
+      is.na(.), 0
+    ) %>% 
+    mutate(
+      # Calculate color references
+      max_att = max(streak_fga, na.rm = TRUE),
+      max_pps = ifelse(max(streak_pps, na.rm = TRUE) > 1.7, max(streak_pps, na.rm = TRUE), 1.7),
+      max_fgp = ifelse(max(streak_pct, na.rm = TRUE) > .7, max(streak_pct, na.rm = TRUE), .7),
+      col_streak_pct = get_color(streak_pct / max_fgp),
+      col_streak_pps = get_color(streak_pps / max_pps),
+      col_streak_fga = get_color(streak_fga / max_att),
+      icon_fg_diff = ifelse(
+        fg_diff < 0,
+        "https://images.emojiterra.com/google/android-10/512px/1f9ca.png",
+        "https://images.emojiterra.com/google/android-11/512px/1f525.png"
+      ),
+      # Adjust zone_range for sorting
+      zone_range = case_when(
+        zone_range == "Less Than 8 ft." ~ 7,
+        zone_range == "24+ ft." ~ 24,
+        TRUE ~ as.numeric(str_split(zone_range, pattern = "-", simplify = T, n = 2)[,1])
+      )
+    ) %>%
+    select(
+      zone_range, name_zone, streak_pct, streak_pps, streak_fga, fg_diff, starts_with("col_"), icon_fg_diff
+    ) %>% 
+    suppressWarnings() %>% 
+    arrange(
+      desc(streak_fga)
+    )
+  
+  # Set last column title
+  if (type == "Compared to League Average"){
+    
+    col_title <- "&Delta; Lg Avg Zone FG%"
+    
+  }else{
+    
+    col_title <- "&Delta; Player Zone FG%"
+    
+  }
+  
+  # Create reactable
+  zone_sum %>% 
+    reactable(
+      compact = TRUE,
+      language = reactableLang(
+        noData = "No Shots Found"
+      ),
+      defaultPageSize = 15,
+      columnGroups = list(
+        colGroup(name = "Shot Zone", columns = c("zone_range", "name_zone")),
+        colGroup(name = "Zone Stats", columns = c("streak_pct", "streak_pps", "fg_diff", "streak_fga"))
+      ),
+      theme = reactableTheme(
+        headerStyle = list(
+          "&:hover[aria-sort]" = list(background = "hsl(0, 0%, 96%)"),
+          "&[aria-sort='ascending'], &[aria-sort='descending']" = list(background = "hsl(0, 0%, 96%)"),
+          borderColor = "#555"
+        )
+      ),
+      striped = FALSE,
+      borderless = TRUE,
+      showSortIcon = TRUE,
+      searchable = FALSE,
+      defaultColDef = colDef(
+        style = cell_style(font_weight = 500)
+      ),
+      style = list(fontFamily = "Karla"),
+      columns = list(
+        zone_range = colDef(
+          name = "Distance",
+          maxWidth = 90,
+          align = "center",
+          cell = function(x){
+            
+            if (x == 7){
+              
+              val <- "< 8 ft."
+              
+            }
+            
+            if (x %in% c(8, 16)){
+              
+              val <- paste0(x, "-", x + 8, " ft.")
+              
+            }
+            
+            if (x == 24){
+              
+              val <- "24+ ft."
+              
+            }
+            
+            val
+            
+          },
+          style = cell_style(font_weight = "bold", font_style = "italic")
+        ),
+        name_zone = colDef(
+          name = "Area",
+          maxWidth = 100,
+          align = "center",
+          style = cell_style(font_weight = "bold", font_style = "italic")
+        ),
+        streak_pct = colDef(
+          name = "Streak FG%",
+          maxWidth = 105,
+          align = "center",
+          format = colFormat(percent = TRUE),
+          style = color_scales(
+            zone_sum,
+            color_ref = "col_streak_pct"
+          )
+        ),
+        streak_pps = colDef(
+          name = "Streak PPS",
+          maxWidth = 105,
+          align = "center",
+          format = colFormat(digits = 1),
+          style = color_scales(
+            zone_sum,
+            color_ref = "col_streak_pps"
+          )
+        ),
+        streak_fga = colDef(
+          name = "Streak FGA",
+          maxWidth = 105,
+          align = "center",
+          style = color_scales(
+            zone_sum,
+            color_ref = "col_streak_fga"
+          )
+        ),
+        fg_diff = colDef(
+          name = col_title,
+          width = 160,
+          html = T,
+          align = 'center',
+          cell = data_bars(
+            ., 
+            fill_color = c("lightblue", "orange"),
+            number_fmt = scales::percent,
+            bold_text = TRUE,
+            img_ref = "icon_fg_diff",
+            border_width = "thick",
+            min_value = -1,
+            max_value = 1,
+            bar_height = 20,
+            text_size = 13
+          ),
+          style = list(borderLeft = "1px dashed rgba(0, 0, 0, 0.3)")
+        ),
+        # Don't need to show colors and icon references
+        col_streak_pct = colDef(show = FALSE),
+        col_streak_pps = colDef(show = FALSE),
+        col_streak_fga = colDef(show = FALSE),
+        icon_fg_diff = colDef(show = FALSE)
+      )
+    )
+}
+
+# Custom range input filter with label and value
+rangeFilter <- function(tableId, columnId, label, min, max, value = NULL, step = NULL, width = "250px") {
+  
+  value <- if (!is.null(value)) value else min
+  inputId <- sprintf("filter_%s_%s", tableId, columnId)
+  valueId <- sprintf("filter_%s_%s__value", tableId, columnId)
+  oninput <- paste(
+    sprintf("document.getElementById('%s').textContent = this.value;", valueId),
+    sprintf("Reactable.setFilter('%s', '%s', this.value)", tableId, columnId)
+  )
+  
+  div(
+      tags$p(`for` = inputId, label, class = "slider-label"),
+    div(
+      style = sprintf("display: flex; align-items: center; width: %s", validateCssUnit(width)),
+      tags$input(
+        id = inputId,
+        type = "range",
+        min = min,
+        max = max,
+        step = step,
+        value = value,
+        oninput = oninput,
+        onchange = oninput, # For IE11 support
+        style = "width: 100%;"
+      ),
+      span(id = valueId, style = "margin-left: 8px;", value)
+    )
+  )
+}
+
+# Filter method that filters numeric columns by minimum value
+filterMinValue <- JS("function(rows, columnId, filterValue) {
+  return rows.filter(function(row) {
+    return row.values[columnId] >= filterValue
+  })
+}")
+
+# Summary defender distance table
+def_distance_table <- function(shot_df){
+  
+  # Calculate general streak statistics
+  general_streak <- shot_df %>% 
+    group_by(
+      shooter 
+    ) %>% 
+    summarise(
+      streak_fga = n(),
+      threes = sum(shot_value == 3 & is_shot_made),
+      streak_efg = (sum(is_shot_made) + (threes * .5)) / streak_fga,
+      pct_open = sum(def_dist == "Open") / n(),
+      .groups = "drop"
+    ) %>% 
+    select(
+      -threes
+    )
+  
+  # Calculate by defender distance bin
+  combined_dat <- shot_df %>% 
+    group_by(
+      shooter, def_dist
+    ) %>% 
+    summarise(
+      fga = n(),
+      threes = sum(shot_value == 3 & is_shot_made),
+      efg = (sum(is_shot_made) + (threes * .5)) / fga,
+      .groups = "drop"
+    ) %>% 
+    # Pivot out to get one row per shooter
+    pivot_wider(
+      id_cols = shooter,
+      values_from = efg,
+      names_from = def_dist,
+      names_prefix = "efg_"
+    ) %>% 
+    clean_names() %>% 
+    # Replace NAs w/ 0
+    replace_na(
+      list(efg_open = 0, efg_tight = 0)
+    ) %>% 
+    mutate(
+      # Calculate coverage diff
+      coverage_diff = efg_open - efg_tight
+    ) %>% 
+    # Join general stats
+    left_join(
+      general_streak,
+      by = "shooter"
+    ) %>% 
+    # Join bsae eFG%s
+    left_join(
+      base_efgs,
+      by = "shooter"
+    ) %>% 
+    mutate(
+      # Round
+      across(
+        .cols = where(is.numeric),
+        ~ round(.x, 3)
+      )
+    ) %>% 
+    # Join headshot urls
+    left_join(
+      players %>% select(shooter = namePlayer, headshot = urlPlayerHeadshot),
+      by = "shooter"
+    ) %>%
+    # Create color referemces
+    mutate(
+      col_fga = get_color(streak_fga / max(streak_fga, na.rm = TRUE)),
+      col_efg = get_color(streak_efg / max(streak_efg, na.rm = TRUE)),
+      col_base = get_color(base_efg / max(base_efg, na.rm = TRUE)),
+      col_pct = get_color(pct_open),
+      col_open = get_color(efg_open / max(efg_open, na.rm = TRUE)),
+      col_tight = get_color(efg_tight / max(efg_tight, na.rm = TRUE)),
+      icon_fg_diff = ifelse(
+        coverage_diff < 0,
+        "https://images.emojiterra.com/google/android-10/512px/1f9ca.png",
+        "https://images.emojiterra.com/google/android-11/512px/1f525.png"
+      )
+    ) %>% 
+    select(
+      headshot, shooter, streak_fga, streak_efg, base_efg, pct_open, efg_open, efg_tight, coverage_diff,
+      starts_with("col_"), icon_fg_diff
+    )
+  
+  # Reactable
+  combined_dat %>% 
+    arrange(
+      desc(streak_fga)
+    ) %>% 
+    reactable(
+      elementId = "def-table-range",
+      fullWidth = FALSE,
+      language = reactableLang(
+        noData = "No Shots Found"
+      ),
+      columnGroups = list(
+        colGroup(
+          name = "Player",
+          columns = c("shooter", "headshot")
+        )
+      ),
+      defaultPageSize = 10,
+      class = "defender-table",
+      striped = FALSE,
+      borderless = TRUE,
+      showSortIcon = TRUE,
+      resizable = TRUE,
+      bordered = FALSE,
+      searchable = TRUE,
+      defaultColDef = colDef(
+        style = cell_style(font_weight = 500),
+        align = "center"
+      ),
+      style = list(fontFamily = "Karla"),
+      columns = list(
+        headshot = colDef(
+          name = "",
+          width = 50,
+          align = 'center',
+          cell = embed_img(height = (40 / (260/190)), width = 40)
+        ),
+        shooter = colDef(
+          name = "",
+          align = "left",
+          style = cell_style(horizontal_align = "left"),
+          width = 190
+        ),
+        streak_fga = colDef(
+          name = "Streak FGA",
+          width = 115,
+          align = "center",
+          style = color_scales(
+            .,
+            color_ref = "col_fga"
+          ),
+          filterMethod = filterMinValue
+        ),
+        streak_efg = colDef(
+          name = "Streak eFG%",
+          width = 130,
+          align = "center",
+          style = color_scales(
+            .,
+            color_ref = "col_efg"
+          ),
+          format = colFormat(percent = TRUE)
+        ),
+        base_efg = colDef(
+          name = "Base eFG%",
+          width = 115,
+          align = "center",
+          style = color_scales(
+            .,
+            color_ref = "col_base"
+          ),
+          format = colFormat(percent = TRUE)
+        ),
+        pct_open = colDef(
+          name = "%FGA Open",
+          align = "center",
+          width = 130,
+          style = color_scales(
+            .,
+            color_ref = "col_pct"
+          ),
+          format = colFormat(percent = TRUE)
+        ),
+        efg_open = colDef(
+          name = "Open eFG%",
+          align = "center",
+          width = 140,
+          style = color_scales(
+            .,
+            color_ref = "col_open"
+          ),
+          format = colFormat(percent = TRUE)
+        ),
+        efg_tight = colDef(
+          name = "Tight eFG%",
+          align = "center",
+          width = 140,
+          style = color_scales(
+            .,
+            color_ref = "col_tight"
+          ),
+          format = colFormat(percent = TRUE)
+        ),
+        coverage_diff = colDef(
+          name = "Coverage &Delta;",
+          width = 150,
+          html = T,
+          align = 'center',
+          cell = data_bars(
+            ., 
+            fill_color = c("lightblue", "orange"),
+            number_fmt = scales::percent,
+            bold_text = TRUE,
+            img_ref = "icon_fg_diff",
+            border_width = "thick",
+            min_value = -1,
+            max_value = 1,
+            bar_height = 20,
+            text_size = 13
+          ),
+          style = list(borderLeft = "1px dashed rgba(0, 0, 0, 0.3)")
+        ),
+        col_fga = colDef(show = FALSE),
+        col_efg = colDef(show = FALSE),
+        col_base = colDef(show = FALSE),
+        col_pct = colDef(show = FALSE),
+        col_open = colDef(show = FALSE),
+        col_tight = colDef(show = FALSE),
+        icon_fg_diff = colDef(show = FALSE)
+      )
+    )
+}
+
+# initial defender distance table
+start_up_def_table <- function(dist_table){
+  
+  
+  # Reactable
+  dist_table %>% 
+    arrange(
+      desc(streak_fga)
+    ) %>% 
+    reactable(
+      elementId = "def-table-range",
+      fullWidth = FALSE,
+      language = reactableLang(
+        noData = "No Shots Found"
+      ),
+      columnGroups = list(
+        colGroup(
+          name = "Player",
+          columns = c("shooter", "headshot")
+        )
+      ),
+      defaultPageSize = 10,
+      class = "defender-table",
+      striped = FALSE,
+      borderless = TRUE,
+      showSortIcon = TRUE,
+      resizable = TRUE,
+      bordered = FALSE,
+      searchable = TRUE,
+      defaultColDef = colDef(
+        style = cell_style(font_weight = 500),
+        align = "center"
+      ),
+      style = list(fontFamily = "Karla"),
+      columns = list(
+        headshot = colDef(
+          name = "",
+          width = 50,
+          align = 'center',
+          cell = embed_img(height = (40 / (260/190)), width = 40)
+        ),
+        shooter = colDef(
+          name = "",
+          align = "left",
+          style = cell_style(horizontal_align = "left"),
+          width = 190
+        ),
+        streak_fga = colDef(
+          name = "Streak FGA",
+          width = 115,
+          align = "center",
+          style = color_scales(
+            .,
+            color_ref = "col_fga"
+          ),
+          filterMethod = filterMinValue
+        ),
+        streak_efg = colDef(
+          name = "Streak eFG%",
+          width = 130,
+          align = "center",
+          style = color_scales(
+            .,
+            color_ref = "col_efg"
+          ),
+          format = colFormat(percent = TRUE)
+        ),
+        base_efg = colDef(
+          name = "Base eFG%",
+          width = 115,
+          align = "center",
+          style = color_scales(
+            .,
+            color_ref = "col_base"
+          ),
+          format = colFormat(percent = TRUE)
+        ),
+        pct_open = colDef(
+          name = "%FGA Open",
+          align = "center",
+          width = 130,
+          style = color_scales(
+            .,
+            color_ref = "col_pct"
+          ),
+          format = colFormat(percent = TRUE)
+        ),
+        efg_open = colDef(
+          name = "Open eFG%",
+          align = "center",
+          width = 140,
+          style = color_scales(
+            .,
+            color_ref = "col_open"
+          ),
+          format = colFormat(percent = TRUE)
+        ),
+        efg_tight = colDef(
+          name = "Tight eFG%",
+          align = "center",
+          width = 140,
+          style = color_scales(
+            .,
+            color_ref = "col_tight"
+          ),
+          format = colFormat(percent = TRUE)
+        ),
+        coverage_diff = colDef(
+          name = "Coverage &Delta;",
+          width = 150,
+          html = T,
+          align = 'center',
+          cell = data_bars(
+            ., 
+            fill_color = c("lightblue", "orange"),
+            number_fmt = scales::percent,
+            bold_text = TRUE,
+            img_ref = "icon_fg_diff",
+            border_width = "thick",
+            min_value = -1,
+            max_value = 1,
+            bar_height = 20,
+            text_size = 13
+          ),
+          style = list(borderLeft = "1px dashed rgba(0, 0, 0, 0.3)")
+        ),
+        col_fga = colDef(show = FALSE),
+        col_efg = colDef(show = FALSE),
+        col_base = colDef(show = FALSE),
+        col_pct = colDef(show = FALSE),
+        col_open = colDef(show = FALSE),
+        col_tight = colDef(show = FALSE),
+        icon_fg_diff = colDef(show = FALSE)
+      )
+    )
+}
+
 # Color functions
 make_color_pal <- function(colors, bias = 1) {
   get_color <- colorRamp(colors, bias = bias)
@@ -730,15 +1126,6 @@ get_color <- make_color_pal(
 # ------------------ #
 # --- Helper DFs --- #
 # ------------------ #
-
-# Headshots from nbastatr
-players <- nba_players() %>% 
-  filter(
-    yearSeasonLast > 2014
-  ) %>% 
-  select(
-    urlPlayerHeadshot, namePlayer
-  )
 
 # Load Court dimensions from (h/t Owen Phillips)
 devtools::source_url("https://github.com/Henryjean/NBA-Court/blob/main/CourtDimensions.R?raw=TRUE")
@@ -764,12 +1151,19 @@ light_court_theme <- list(
 # Columns for input
 season_values <- paste0(seq(2015, 2020, 1), "-", seq(16, 21, 1))
 
-shooter_values <- dbGetQuery(con, "SELECT DISTINCT shooter FROM streak_shots_nba WHERE streak_col IS NULL") %>% 
+shooter_values <- dbGetQuery(con, "SELECT DISTINCT shooter FROM streak_shots_nba") %>% 
   pull(shooter)
 
-## Start up data for intital plot + table
+## Start up data for initial plot and tables
 klay_plot <- read_csv("./start_up_data/plot_data.csv")
 klay_table <- read_csv("./start_up_data/table_data.csv")
+dist_table <- read_csv("./start_up_data/def_dist_table.csv") 
+
+# Player headshots
+players <- read_csv("./start_up_data/player_headshots.csv")
+
+# Player base eFG%s for tracking data sample
+base_efgs <- read_csv("./start_up_data/base_tracking_efg.csv")
 
 # League averages
 league_averages <- bind_rows(
