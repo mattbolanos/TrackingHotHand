@@ -2,13 +2,10 @@
 library(RPostgres)
 library(DBI)
 
-# DB Connection
-host_db <- ""
-def_db <- ""
-usr <- ""
-pwd <- ""
-db_opts <- ""
+# Get creds
+source(".secrets/creds.R")
 
+# DB Connection
 con <- dbConnect(
   RPostgres::Postgres(), 
   dbname = def_db,
