@@ -31,6 +31,7 @@ fluidPage(
   # CSS Components to include
   tags$head(tags$link(rel="stylesheet", type="text/css", href="main.css")),
   navbarPage(
+    collapsible = TRUE,
     title = "NBA Hot Hand Analysis",
     position = "fixed-top",
     tabPanel(
