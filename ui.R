@@ -13,14 +13,17 @@ library(shinythemes)
 # nbastatR connect thing
 Sys.setenv("VROOM_CONNECTION_SIZE" = 1350000)
 
-# Source DB connection
+# # Source DB connection
 source("connection.R")
-# Source functions
+# Source utiliies
 source("utilities.R")
 # Source modules
 source("modules/module_home.R")
 source("modules/module_shot_charts.R")
 source("modules/module_def_dist.R")
+# Source functions
+source("functions/plot_functions.R")
+source("functions/ui_functions.R")
 
 ## UI ## 
 fluidPage(

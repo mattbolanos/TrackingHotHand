@@ -80,7 +80,7 @@ home_ui <- function(id){
              In an attempt to compare apples to apples, players are compared to 
              league average after the same streak, rather than the base league 
              average (e.g. Player X after 3+ Makes is compared to how the league 
-             shot after 3+ Makes). The base FG% computed when comparing players
+             shot after 3+ Makes). The base eFG% computed when comparing players
              against their own averages is irrespective of streak.",
       style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
     ),
@@ -88,7 +88,7 @@ home_ui <- function(id){
       "This tool by itself suffers from the same limitations that all 
              shot charts do, in that the dots on the court offer no information 
              regarding how the shot transpired. So while it may be useful for 
-             opponents to know that Klay Thompson had a +15 FG% relative to 
+             opponents to know that Klay Thompson had a +15 eFG% relative to 
              league average on all above the break 3s after 3+ Makes in 2016-17, 
              there is still more information required regarding the Warriors’ 
              sets and actions that created those attempts for Klay. One would 

@@ -1,4 +1,6 @@
-# ---- connection.R
+# --- Connection --- #
+
+# Package set up
 library(RPostgres)
 library(DBI)
 

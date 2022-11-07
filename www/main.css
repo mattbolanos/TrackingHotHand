@@ -1,4 +1,7 @@
+/* import font */
 @import url(https://fonts.googleapis.com/css?family=Karla);
+/* import tippy animation*/
+@import url('tippy.js/animations/scale.css');
 
 /* selectize dropdowns */
 .selectize-input, .selectize-dropdown {
@@ -22,4 +25,9 @@
   font-family: 'Georgia', sans-serif;
   font-size: 16px;
   font-weight: bold;
+}
+
+.tippy-tooltip {
+  font-size: 12.75px;
+  padding: 0.3rem 0.6rem;
 }

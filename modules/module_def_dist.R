@@ -26,6 +26,7 @@ distance_ui <- function(id){
           style = "font-size:14px;font-family:Georgia; color:black"
         ),
         br(),
+        br(),
         fluidRow(
           column(2, offset = 0, selectizeInput(NS(id, "year_choice"), choices = NULL, label = "Season(s)")),
           column(2, offset = 0, selectizeInput(NS(id, "streak_choice"), choices = NULL, label = "Streak")),
@@ -92,7 +93,7 @@ distance_server <- function(id){
       session = session,
       'streak_choice',
       label = 'Streak',
-      selected = '3+ Makes',
+      selected = '2 Makes',
       choices = c(
         "1 Make", "2 Makes", "3+ Makes",
         "1 Miss", "2 Misses", "3+ Misses"
@@ -128,7 +129,7 @@ distance_server <- function(id){
     # Start up table
     output$def_table <- renderReactable({
       
-      start_up_def_table(dist_table)
+      start_up_def_table(dist_table, "2 Makes")
       
     })
     
@@ -219,7 +220,7 @@ distance_server <- function(id){
       # Create reactable
       output$def_table <- renderReactable({
         
-        def_distance_table(shots)
+        def_distance_table(shots, streak_sel)
         
       })
       

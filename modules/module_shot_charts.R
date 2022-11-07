@@ -37,12 +37,12 @@ shot_chart_ui <- function(id){
       fluidRow(
         column(
           width = 5,
-          plotOutput(NS(id, "streak_plot"), height = "460px") %>% 
+          plotOutput(NS(id, "streak_plot"), height = "480px") %>% 
             withSpinner(image = "loading.gif", image.width = "150px", image.height = "150px")
         ),
         column(
-          width = 6,
-          reactableOutput(NS(id, "streak_table"), height = "460px") %>% 
+          width = 7,
+          reactableOutput(NS(id, "streak_table"), height = "480px") %>% 
             withSpinner(image = "loading.gif", image.width = "150px", image.height = "150px")
         )
       )
@@ -133,7 +133,8 @@ shot_chart_server <- function(id){
             name_zone, zone_range, base_pct = league_pct
           ), 
         klay_table, 
-        type = "League Avg"
+        type = "League Avg",
+        streak_sel = "3+ Makes"
       )
       
     })
@@ -282,10 +283,14 @@ shot_chart_server <- function(id){
               name_zone, zone_range
             ) %>% 
             summarise(
-              streak_pct = sum(shot_made_numeric) / n(),
-              streak_pps = sum(shot_made_numeric * shot_value) / n(),
               streak_fga = n(),
+              threes = sum(shot_value == 3 & shot_made_numeric == 1),
+              streak_pct = (sum(shot_made_numeric) + (threes * .5)) / streak_fga,
+              streak_pps = sum(shot_made_numeric * shot_value) / n(),
               .groups = "drop"
+            ) %>% 
+            select(
+              -threes
             )
           
           # Create table
@@ -298,7 +303,8 @@ shot_chart_server <- function(id){
                 name_zone, zone_range, base_pct = league_pct
               ), 
             streak_pcts, 
-            type = scope_sel
+            type = scope_sel,
+            streak_sel
           )
           
         }else{
@@ -314,10 +320,14 @@ shot_chart_server <- function(id){
               name_zone, zone_range
             ) %>% 
             summarise(
-              streak_pct = sum(shot_made_numeric) / n(),
-              streak_pps = sum(shot_made_numeric * shot_value) / n(),
               streak_fga = n(),
+              threes = sum(shot_value == 3 & shot_made_numeric == 1),
+              streak_pct = (sum(shot_made_numeric) + (threes * .5)) / streak_fga,
+              streak_pps = sum(shot_made_numeric * shot_value) / n(),
               .groups = "drop"
+            ) %>% 
+            select(
+              -threes
             )
           
           # Base %s
@@ -326,12 +336,21 @@ shot_chart_server <- function(id){
               name_zone, zone_range
             ) %>% 
             summarise(
-              base_pct = sum(shot_made_numeric) / n(),
+              threes = sum(shot_value == 3 & shot_made_numeric == 1),
+              base_pct = (sum(shot_made_numeric) + (threes * .5)) / n(),
               .groups = "drop"
+            ) %>% 
+            select(
+              -threes
             )
           
           # Create table
-          shot_sum_table(base_pcts, streak_pcts, type = "Own Avg")
+          shot_sum_table(
+            base_pcts, 
+            streak_pcts, 
+            type = "Own Avg", 
+            streak_sel
+          )
           
         }
         
