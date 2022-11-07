@@ -403,8 +403,8 @@ plot_shot_chart <- function(hex_df, type = "League Avg", streak_sel, year_sel, p
       plot.margin = margin(unit = "npc", t = .02, b = .02, r = .02, l = .02),
       legend.position = 'bottom',
       # legend.box.margin = leg_box_mar, 
-      plot.title = element_text(hjust = 0.5, size = 16, face = "bold", vjust = -2),
-      plot.subtitle = element_text(hjust = 0.5, size = 14, vjust = -2.5, face = "italic", margin = margin(b = -.25, unit = "npc")), 
+      plot.title = element_text(hjust = 0.5, size = 18, face = "bold", vjust = -2),
+      plot.subtitle = element_text(hjust = 0.5, size = 15, vjust = -2.5, face = "italic", margin = margin(b = -.25, unit = "npc")), 
       plot.caption = element_text(hjust = 0.5, size = 10, vjust = 2.5)
     )
   
@@ -416,7 +416,7 @@ plot_shot_chart <- function(hex_df, type = "League Avg", streak_sel, year_sel, p
       
     ) +
     annotation_custom(
-      rasterGrob(pic, width = unit(.1285,'npc'), x = .067, y = .949, default.units = "npc")
+      rasterGrob(pic, width = unit(.1285,'npc'), x = .067, y = .94, default.units = "npc")
     )
   
   ggsave("shot_chart.png", fin, h = 7.75, w = 8)
@@ -536,7 +536,7 @@ shot_sum_table <- function(base_pct_df, streak_pct_df, type = "Compared to Leagu
         .cols = c(
           streak_pct, streak_pps, fg_diff
         ),
-        ~ round(.x, 2)
+        ~ round(.x, 3)
       ),
       name_zone = gsub("Side", "", name_zone)
     ) %>%
@@ -661,7 +661,7 @@ shot_sum_table <- function(base_pct_df, streak_pct_df, type = "Compared to Leagu
             "Streak eFG%", 
             paste("The player's effective field goal % after", streak_sel)
           ),
-          format = colFormat(percent = TRUE),
+          format = colFormat(percent = TRUE, digits = 1),
           style = color_scales(
             zone_sum,
             color_ref = "col_streak_pct"
@@ -675,7 +675,7 @@ shot_sum_table <- function(base_pct_df, streak_pct_df, type = "Compared to Leagu
             "Streak PPS", 
             paste("Player's points per shot after", streak_sel)
           ),
-          format = colFormat(digits = 1),
+          format = colFormat(digits = 2),
           style = color_scales(
             zone_sum,
             color_ref = "col_streak_pps"
@@ -706,7 +706,7 @@ shot_sum_table <- function(base_pct_df, streak_pct_df, type = "Compared to Leagu
           cell = data_bars(
             ., 
             fill_color = c("lightblue", "orange"),
-            number_fmt = scales::percent,
+            number_fmt = scales::percent_format(accuracy = .1),
             bold_text = TRUE,
             img_ref = "icon_fg_diff",
             border_width = "thick",
@@ -927,7 +927,7 @@ def_distance_table <- function(shot_df, streak_sel) {
             .,
             color_ref = "col_efg"
           ),
-          format = colFormat(percent = TRUE)
+          format = colFormat(percent = TRUE, digits = 1)
         ),
         base_efg = colDef(
           name = "Base eFG%",
@@ -941,7 +941,7 @@ def_distance_table <- function(shot_df, streak_sel) {
             .,
             color_ref = "col_base"
           ),
-          format = colFormat(percent = TRUE)
+          format = colFormat(percent = TRUE, digits = 1)
         ),
         pct_open = colDef(
           name = "%FGA Open",
@@ -955,7 +955,7 @@ def_distance_table <- function(shot_df, streak_sel) {
             .,
             color_ref = "col_pct"
           ),
-          format = colFormat(percent = TRUE)
+          format = colFormat(percent = TRUE, digits = 1)
         ),
         efg_open = colDef(
           name = "Open eFG%",
@@ -969,7 +969,7 @@ def_distance_table <- function(shot_df, streak_sel) {
             .,
             color_ref = "col_open"
           ),
-          format = colFormat(percent = TRUE)
+          format = colFormat(percent = TRUE, digits = 1)
         ),
         efg_tight = colDef(
           name = "Tight eFG%",
@@ -983,7 +983,7 @@ def_distance_table <- function(shot_df, streak_sel) {
             .,
             color_ref = "col_tight"
           ),
-          format = colFormat(percent = TRUE)
+          format = colFormat(percent = TRUE, digits = 1)
         ),
         coverage_diff = colDef(
           name = "Coverage &Delta;",
@@ -997,7 +997,7 @@ def_distance_table <- function(shot_df, streak_sel) {
           cell = data_bars(
             ., 
             fill_color = c("lightblue", "orange"),
-            number_fmt = scales::percent,
+            number_fmt = scales::percent_format(accuracy = .1),
             bold_text = TRUE,
             img_ref = "icon_fg_diff",
             border_width = "thick",
@@ -1092,7 +1092,7 @@ start_up_def_table <- function(dist_table, streak_sel) {
             .,
             color_ref = "col_efg"
           ),
-          format = colFormat(percent = TRUE)
+          format = colFormat(percent = TRUE, digits = 1)
         ),
         base_efg = colDef(
           name = "Base eFG%",
@@ -1106,7 +1106,7 @@ start_up_def_table <- function(dist_table, streak_sel) {
             .,
             color_ref = "col_base"
           ),
-          format = colFormat(percent = TRUE)
+          format = colFormat(percent = TRUE, digits = 1)
         ),
         pct_open = colDef(
           name = "%FGA Open",
@@ -1120,7 +1120,7 @@ start_up_def_table <- function(dist_table, streak_sel) {
             .,
             color_ref = "col_pct"
           ),
-          format = colFormat(percent = TRUE)
+          format = colFormat(percent = TRUE, digits = 1)
         ),
         efg_open = colDef(
           name = "Open eFG%",
@@ -1134,7 +1134,7 @@ start_up_def_table <- function(dist_table, streak_sel) {
             .,
             color_ref = "col_open"
           ),
-          format = colFormat(percent = TRUE)
+          format = colFormat(percent = TRUE, digits = 1)
         ),
         efg_tight = colDef(
           name = "Tight eFG%",
@@ -1148,7 +1148,7 @@ start_up_def_table <- function(dist_table, streak_sel) {
             .,
             color_ref = "col_tight"
           ),
-          format = colFormat(percent = TRUE)
+          format = colFormat(percent = TRUE, digits = 1)
         ),
         coverage_diff = colDef(
           name = "Coverage &Delta;",
@@ -1162,7 +1162,7 @@ start_up_def_table <- function(dist_table, streak_sel) {
           cell = data_bars(
             ., 
             fill_color = c("lightblue", "orange"),
-            number_fmt = scales::percent,
+            number_fmt = scales::percent_format(accuracy = .1),
             bold_text = TRUE,
             img_ref = "icon_fg_diff",
             border_width = "thick",

@@ -9,17 +9,17 @@ home_ui <- function(id){
     br(),
     br(),
     HTML(
-      '<h1 style="font-family:Gill Sans;color:black; width:75%; text-align:center;margin: 0 auto; font-weight: bold; font-size: 38px">
+      '<h1 style="font-family:Georgia;color:black; width:75%; text-align:center;margin: 0 auto; font-weight: bold; font-size: 38px">
       NBA Hot Hand Analysis &#128293 </h1>'
     ),
     p(
       "By Matt Bolaños | matthew.a.bolanos@gmail.com |", a("Portfolio", href="https://www.mattbolanos.com/", target="_blank"),
-      "|", a("Code", href="https://github.com/mattbolanos/Tracking.Hot.Hand", target="_blank"),
-      style = "font-size:16px;font-family:Georgia; color:black; width:75%; text-align:center; margin: 0 auto; "
+      "|", a("Code", href="https://github.com/mattbolanos/TrackingHotHand", target="_blank"),
+      style = "font-size:17px;font-family:Karla; color:black; width:75%; text-align:center; margin: 0 auto; "
     ),
     p(
       "Introduction",
-      style = "font-size:24px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; font-weight: bold"
+      style = "font-size:24px; font-family:Georgia;color:black; width:75%; text-align:left;margin: 0 auto; font-weight: bold"
     ),
     br(),
 
@@ -32,7 +32,7 @@ home_ui <- function(id){
              the Hot Hand is the idea that a player has an increased
              probability of making their next shot if they are “on fire”, i.e.,
              they have made their several previous shots.",
-      style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
+      style = "font-size:18px; font-family:Karla;color:black; width:75%; text-align:left;margin: 0 auto; "
     ),
     br(),
     p(
@@ -47,7 +47,7 @@ home_ui <- function(id){
              application is best used in random chance scenarios
              (e.g., flipping a coin), as opposed to skill-based performance
              employing muscle memory.",
-      style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
+      style = "font-size:18px; font-family:Karla;color:black; width:75%; text-align:left;margin: 0 auto; "
     ),
     br(),
     p(
@@ -62,13 +62,13 @@ home_ui <- function(id){
              consistent with that of Gilovich, Vallone & Tversky. Eighteen
              months later, after coming across some SportVU Game Logs from the
              2015-16 NBA Season, I decided to revisit my Hot Hand analysis.",
-      style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
+      style = "font-size:18px; font-family:Karla;color:black; width:75%; text-align:left;margin: 0 auto; "
     ),
     br(),
     # Tab 1 Blurb ----------------------------------------------------------------------------------------------------------------------
     p(
       "Tab 1: 2015-2021 Shot Charts by Streak",
-      style = "font-size:24px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; font-weight: bold"
+      style = "font-size:24px; font-family:Georgia;color:black; width:75%; text-align:left;margin: 0 auto; font-weight: bold"
     ),
     br(),
     p(
@@ -82,7 +82,7 @@ home_ui <- function(id){
              average (e.g. Player X after 3+ Makes is compared to how the league 
              shot after 3+ Makes). The base eFG% computed when comparing players
              against their own averages is irrespective of streak.",
-      style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
+      style = "font-size:18px; font-family:Karla;color:black; width:75%; text-align:left;margin: 0 auto; "
     ),
     p(
       "This tool by itself suffers from the same limitations that all 
@@ -95,7 +95,7 @@ home_ui <- function(id){
              also need to know the defensive schemes that were used to defend 
              each shot. Joining the subject shot locations with the corresponding 
              film clips would be a logical extension of this analysis.",
-      style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
+      style = "font-size:18px; font-family:Karla;color:black; width:75%; text-align:left;margin: 0 auto; "
     ),
     br(),
     
@@ -103,7 +103,7 @@ home_ui <- function(id){
     
     p(
       "Tab 2: 2014-16 SportVu Closest Defender & Streaks",
-      style = "font-size:24px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; font-weight: bold"
+      style = "font-size:24px; font-family:Georgia;color:black; width:75%; text-align:left;margin: 0 auto; font-weight: bold"
     ),
     br(),
     p(
@@ -114,7 +114,7 @@ home_ui <- function(id){
              calculations. This tweak boils the Hot Hand down to its basic parts, 
              and helps answer the question: “Does Player X have a higher chance 
              of making more difficult shots after a string of makes?”", 
-      style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
+      style = "font-size:18px; font-family:Karla;color:black; width:75%; text-align:left;margin: 0 auto; "
     ),
     br(),
     p(
@@ -145,7 +145,7 @@ home_ui <- function(id){
              One of my principles for this project was quality over quantity, since 
              I would rather have 10,000 shots with accurate closest defender 
              distances than 100,000 shots with inaccurate defender distances.",
-      style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
+      style = "font-size:18px; font-family:Karla;color:black; width:75%; text-align:left;margin: 0 auto; "
     ),
     p(
       "Much has been said about the questionable accuracy of tracking defender 
@@ -170,21 +170,21 @@ home_ui <- function(id){
              tougher shot than a Tight attempt from 4 feet away. However 
              the samples would be even smaller if I filtered out attempts from a 
              certain threshold of shot distance, so I decided against this.",
-      style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
+      style = "font-size:18px; font-family:Karla;color:black; width:75%; text-align:left;margin: 0 auto; "
     ),
     br(),
     p(
       strong("UPDATE 08/03/21:"), 
       "I added 128,069 shots from the 2014-15 NBA Season into the second tab's database. The data came courtsey of", 
       a("Dan Becker.", href="https://www.kaggle.com/dansbecker/nba-shot-logs", target="_blank"),
-      style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
+      style = "font-size:18px; font-family:Karla;color:black; width:75%; text-align:left;margin: 0 auto; "
     ),
     br(),
     # Acknowledgements blurb -----------------------------------------------------------------------------------------------------------
     
     p(
       "Acknowledgements",
-      style = "font-size:24px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; font-weight: bold"
+      style = "font-size:24px; font-family:Georgia;color:black; width:75%; text-align:left;margin: 0 auto; font-weight: bold"
     ),
     br(),
     p(
@@ -196,8 +196,9 @@ home_ui <- function(id){
       "and nbastatR. As I mentioned above  Dan Becker uploaded an amazing dataset from the 2014-15 Season with 
       closest defender distances on", 
       a("Kaggle.", href="https://www.kaggle.com/dansbecker/nba-shot-logs", target="_blank"),
-      style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
+      style = "font-size:18px; font-family:Karla;color:black; width:75%; text-align:left;margin: 0 auto; "
     ),
+    br(),
     p(
       "I drew a lot of inspiration from various titans in the analytics space. I’ve already mentioned", 
       a("Kostya", href="https://kmedved.com/2020/08/06/nba-stabilization-rates-and-the-padding-approach/", target="_blank"), 
@@ -208,8 +209,9 @@ home_ui <- function(id){
       "at his Substack has a great tutorial on working with hexbin data with R and using it for shot 
       charts, and great R tutorials in general. Finally, thank you to the groundbreakers of Gilovich and company,
       who took the first stab at investigating the Hot Hand phenomenon.",
-      style = "font-size:18px; font-family:Gill Sans;color:black; width:75%; text-align:left;margin: 0 auto; "
-    )
+      style = "font-size:18px; font-family:Karla;color:black; width:75%; text-align:left;margin: 0 auto; "
+    ),
+    br()
   )
   
 }

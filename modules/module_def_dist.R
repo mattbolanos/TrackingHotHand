@@ -18,12 +18,12 @@ distance_ui <- function(id){
           "Version: 2022-10-23",style = "font-size:16px;font-family:Georgia; color:red"
         ),
         strong(
-          "Created by Matt Bolaños | matthew.a.bolanos@gmail.com |",
+          "Created by @mattabolanos |",
           a(
             "Spinner", href = "https://media.tenor.com/_u-gDFZQuIQAAAAM/basketball-sports.gif",
             target = "_blank"
           ),
-          style = "font-size:14px;font-family:Georgia; color:black"
+          style = "font-size:14px;font-family:Karla; color:black"
         ),
         br(),
         br(),
