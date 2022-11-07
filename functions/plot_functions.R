@@ -400,7 +400,7 @@ plot_shot_chart <- function(hex_df, type = "League Avg", streak_sel, year_sel, p
       legend.title=element_text(size=13, face = "bold.italic"),
       legend.text = element_text(size = 10.5, face = "bold"), 
       legend.margin= margin(t = -.065, unit = 'npc'),
-      plot.margin = margin(unit = "npc"),
+      plot.margin = margin(unit = "npc", t = .02, b = .02, r = .02, l = .02),
       legend.position = 'bottom',
       # legend.box.margin = leg_box_mar, 
       plot.title = element_text(hjust = 0.5, size = 16, face = "bold", vjust = -2),

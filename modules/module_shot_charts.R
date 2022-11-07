@@ -116,7 +116,8 @@ shot_chart_server <- function(id){
       actionButton(
         session$ns("updatebtn"), 
         HTML("Update &#128293"), 
-        style="color: white; background-color: #232323; font-weight:bold; margin-top:10%; font-size: 18px"
+        style="color: white; background-color: #232323; font-weight:bold; margin-top:12%; font-size:17px; height:42px;
+        padding:6px; border-radius:6px; margin-left:-7%;"
       )
       
     })

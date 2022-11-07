@@ -13,7 +13,7 @@ library(shinythemes)
 # nbastatR connect thing
 Sys.setenv("VROOM_CONNECTION_SIZE" = 1350000)
 
-# # Source DB connection
+# Source DB connection
 source("connection.R")
 # Source utiliies
 source("utilities.R")
