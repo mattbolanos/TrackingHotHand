@@ -17,11 +17,10 @@ library(grid)
 library(ggtext)
 library(htmltools)
 library(tippy)
+library(data.table)
 
 # Set margin def
 margin <- ggplot2::margin
-
-
 
 # ------------------ #
 # --- Helper DFs --- #
@@ -55,15 +54,15 @@ shooter_values <- dbGetQuery(con, "SELECT DISTINCT shooter FROM streak_shots_nba
   pull(shooter)
 
 ## Start up data for initial plot and tables
-klay_plot <- read_csv("./start_up_data/plot_data.csv")
-klay_table <- read_csv("./start_up_data/table_data.csv")
-dist_table <- read_csv("./start_up_data/def_dist_table.csv") 
+klay_plot <- fread("./start_up_data/plot_data.csv")
+klay_table <- fread("./start_up_data/table_data.csv")
+dist_table <- fread("./start_up_data/def_dist_table.csv") 
 
 # Player headshots
-players <- read_csv("./start_up_data/player_headshots.csv")
+players <- fread("./start_up_data/player_headshots.csv")
 
 # Player base eFG%s for tracking data sample
-base_efgs <- read_csv("./start_up_data/base_tracking_efg.csv")
+base_efgs <- fread("./start_up_data/base_tracking_efg.csv")
 
 # League averages
 league_averages <- bind_rows(
