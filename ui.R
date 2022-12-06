@@ -50,7 +50,4 @@ fluidPage(
       distance_ui("distance")
     )
   )
-  
-
-  
 )
