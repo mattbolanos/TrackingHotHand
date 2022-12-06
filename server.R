@@ -5,7 +5,7 @@
 shinyServer(function(input, output, session) {
   
   # Home page
-  home_server(id = "home_page")
+  home_server("home_page")
   
   # Shot chart server
   shot_chart_server("shot_chart")
