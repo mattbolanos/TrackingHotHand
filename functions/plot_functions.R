@@ -12,13 +12,6 @@ hex_bounds <- function(x, binwidth) {
   )
 }
 
-# Court plotting related
-circle_points <- function(center = c(0, 0), radius = 1, npoints = 360) {
-  angles = seq(0, 2 * pi, length.out = npoints)
-  return(data_frame(x = center[1] + radius * cos(angles),
-                    y = center[2] + radius * sin(angles)))
-}
-
 # Calculate hex bins for shot chart
 get_hexbin_data <- function(type = "League Avg", player_shots, comparison_shots) {
   
